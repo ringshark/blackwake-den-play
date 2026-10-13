@@ -4,8 +4,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
 		<title>Blackwake Den</title>
-<meta name="description" content="Fight your way onto the gladiator circuit. Challenge your rival in Blackwake, earn reputation and travel to Highcrest.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23183038'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='22' fill='%23b5d8dc'%3EB%3C/text%3E%3C/svg%3E">
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -92,54 +90,11 @@ body {
 	z-index: 1;
 }
 		</style>
-		
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="index.icon.png" />
 <link rel="apple-touch-icon" href="index.apple-touch-icon.png"/>
 
-<style>#status-splash{display:none!important}#status{background:#10252f;font:18px system-ui}#download{position:absolute;top:40%;left:10%;right:10%;text-align:center;color:#b5d8dc}#portrait{display:none;position:fixed;inset:0;z-index:30;background:#10252f;color:#e8f1ee;align-items:center;justify-content:center;text-align:center;padding:32px;font:20px system-ui}#portrait p{max-width:300px}@media(orientation:portrait) and (max-width:700px){#portrait{display:flex}}canvas{touch-action:none}body{overscroll-behavior:none}</style>
-	<script>
-// CI replaces the placeholder with the deployed Worker URL; empty means same-origin.
-window.BLACKWAKE_API_BASE="";
-// Cloud-backed expedition checkpoints. The save lives on the server; the browser keeps only the player key
-// (shown in-game as the recovery code) that proves which save this device plays.
-window.blackwakeSave={status:'loading',state:null,revision:0,loaded:false,pending:null,busy:false,error:'',blocked:false,key:'',keyStored:true,recoveryMessage:'',
- api(){const b=window.BLACKWAKE_API_BASE;return(typeof b==='string'&&b&&!b.startsWith('__')?b.replace(/\/+$/,''):'')+'/api/progress';},
- headers(key,json){const h={Authorization:'Bearer '+key};if(json)h['Content-Type']='application/json';return h;},
- initKey(){const slot='blackwake.playerKey';let key='';
-  try{const saved=localStorage.getItem(slot);if(saved&&/^[0-9a-f]{32}$/.test(saved))key=saved;}catch{}
-  if(!key){const bytes=crypto.getRandomValues(new Uint8Array(16));key=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
-   try{localStorage.setItem(slot,key);this.keyStored=localStorage.getItem(slot)===key;}catch{this.keyStored=false;}}
-  this.key=key;},
- recoveryCode(){return this.key.toUpperCase().match(/.{4}/g).join('-');},
- copyCode(){const code=this.recoveryCode();
-  const manual=()=>{this.recoveryMessage='Copy blocked. Select the code and copy it by hand.';try{window.prompt('Your recovery code',code);}catch{}};
-  try{navigator.clipboard.writeText(code).then(()=>{this.recoveryMessage='Recovery code copied.';},manual);}catch{manual();}},
- async useRecoveryCode(input,confirmFn){
-  const fail=error=>{this.recoveryMessage=error;return{ok:false,error};};
-  const key=String(input||'').replace(/[\s-]/g,'').toLowerCase();
-  if(!/^[0-9a-f]{32}$/.test(key))return fail('That is not a recovery code. It is 32 letters and numbers (0-9, A-F).');
-  if(key===this.key)return fail('That is already this device’s recovery code.');
-  try{const r=await fetch(this.api(),{cache:'no-store',headers:this.headers(key)});const d=await r.json();
-   if(!r.ok)throw Error(d.error||'Could not check that code.');
-   if(!d.revision)return fail('No save was found for that code. Check it and try again.');
-  }catch(e){return fail(e.message||'Could not check that code. Try again online.');}
-  const ask=confirmFn||(m=>window.confirm(m));
-  if(!ask('Switch this device to the save for that recovery code? This device will stop playing its current save. Keep the current recovery code (Recovery menu) if you want to return to it.')){this.recoveryMessage='Recovery cancelled.';return{ok:false,cancelled:true};}
-  if(this.pending&&this.loaded&&!this.blocked)await this.flush();
-  try{localStorage.setItem('blackwake.playerKey',key);if(localStorage.getItem('blackwake.playerKey')!==key)throw Error();}catch{return fail('This browser blocks storage, so it cannot switch saves.');}
-  this.recoveryMessage='Switching saves…';location.reload();return{ok:true};},
- enterCode(){const text=window.prompt('Enter your recovery code (from the Recovery menu on your other device):');if(text===null)return Promise.resolve({ok:false,cancelled:true});return this.useRecoveryCode(text);},
- async load(){this.status='loading';try{const r=await fetch(this.api(),{cache:'no-store',headers:this.headers(this.key)});if(!r.ok)throw Error('Could not load progress. Retry before playing.');const d=await r.json();this.state=d.state;this.revision=d.revision;this.loaded=true;this.status='saved';this.error='';}catch(e){this.status='error';this.error=e.message;}},
- save(state){this.pending=state;if(this.loaded&&!this.blocked)this.flush();},
- async flush(){if(this.busy||!this.pending||this.blocked)return;this.busy=true;const state=this.pending;this.pending=null;this.status='saving';try{const r=await fetch(this.api(),{method:'PUT',headers:this.headers(this.key,true),body:JSON.stringify({revision:this.revision,state})});const d=await r.json();if(!r.ok){if(r.status===409)this.blocked=true;throw Error(d.error||'Save unavailable. Retry.');}this.revision=d.revision;this.state=state;this.status='saved';this.error='';}catch(e){if(!this.pending)this.pending=state;this.status='error';this.error=e.message;}finally{this.busy=false;}if(this.pending&&this.status==='saved')this.flush();},
- retry(){if(this.blocked){location.reload();return;}if(!this.loaded)this.load();else this.flush();}
-};
-window.blackwakeSave.initKey();
-window.blackwakeSave.load();
-
-</script>
-</head>
+	</head>
 	<body>
-<div id="portrait"><p>Turn your phone sideways to play Blackwake Den.</p></div>
 		<canvas id="canvas">
 			Your browser does not support the canvas tag.
 		</canvas>
@@ -149,32 +104,14 @@ window.blackwakeSave.load();
 		</noscript>
 
 		<div id="status">
-<div id="download">Loading Blackwake Den…</div>
 			<img id="status-splash" class="show-image--true fullsize--true use-filter--true" src="index.png" alt="">
 			<progress id="status-progress"></progress>
 			<div id="status-notice"></div>
 		</div>
 
+		<script src="index.js"></script>
 		<script>
-const originalFetch=window.fetch.bind(window);
-window.fetch=async function(input,options){
- const url=typeof input==='string'?input:(input.url||String(input));
- if(!new URL(url,location.href).pathname.endsWith('/index.wasm'))return originalFetch(input,options);
- const buffers=[];let downloaded=0;const total=38200000;
- for(let i=0;i<2;i++){
-  const response=await originalFetch(new URL('index.wasm.part'+i,location.href),options);
-  if(!response.ok)throw new Error('Game download failed. Reload to retry.');
-  const reader=response.body.getReader();
-  while(true){const {value,done}=await reader.read();if(done)break;buffers.push(value);downloaded+=value.byteLength;const label=document.getElementById('download');if(label)label.textContent='Loading Blackwake Den… '+Math.min(99,Math.round(downloaded/total*100))+'%';}
- }
- const merged=new Uint8Array(downloaded);let offset=0;
- for(const chunk of buffers){merged.set(chunk,offset);offset+=chunk.byteLength;}
- return new Response(merged,{status:200,headers:{'Content-Type':'application/wasm','Content-Length':String(downloaded)}});
-};
-</script>
-<script src="index.js"></script>
-		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":5759936,"index.wasm":38034280},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":12496,"index.wasm":38034280},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
